@@ -1,0 +1,604 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { 
+  Github, Linkedin, Mail, Phone, MapPin, ArrowUpRight, 
+  Code, Database, Globe, Cpu, Palette, Server, 
+  FileCode, Layers, Box, Zap, Brain, Eye
+} from 'lucide-react';
+
+const App = () => {
+  const scrollRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const initializeScroll = async () => {
+      const container = scrollRef.current;
+      if (!container) return;
+
+      // Enhanced GSAP-like animations
+      const tl = {
+        fromTo: (elements, from, to, options = {}) => {
+          const els = typeof elements === 'string' ? document.querySelectorAll(elements) : [elements];
+          els.forEach((el, index) => {
+            if (!el) return;
+            
+            const delay = (options.delay || 0) + (index * (options.stagger || 0));
+            
+            // Set initial state
+            Object.assign(el.style, {
+              opacity: from.opacity ?? '1',
+              transform: `translateY(${from.y || 0}px) translateX(${from.x || 0}px) scale(${from.scale || 1}) rotate(${from.rotation || 0}deg)`,
+              transition: `all ${options.duration || 1}s ${options.ease || 'cubic-bezier(0.23, 1, 0.32, 1)'}`
+            });
+            
+            // Animate to final state with delay
+            setTimeout(() => {
+              Object.assign(el.style, {
+                opacity: to.opacity ?? '1',
+                transform: `translateY(${to.y || 0}px) translateX(${to.x || 0}px) scale(${to.scale || 1}) rotate(${to.rotation || 0}deg)`
+              });
+            }, delay * 1000);
+          });
+        }
+      };
+
+      // Hero animations with improved timing
+      tl.fromTo('.hero-title span', { opacity: 0, y: 120, rotation: 5 }, { opacity: 1, y: 0, rotation: 0 }, { 
+        duration: 1.4, delay: 0.3, stagger: 0.1, ease: 'cubic-bezier(0.23, 1, 0.32, 1)'
+      });
+      tl.fromTo('.hero-subtitle', { opacity: 0, y: 80, scale: 0.9 }, { opacity: 1, y: 0, scale: 1 }, { 
+        duration: 1.2, delay: 1.2 
+      });
+      tl.fromTo('.hero-location', { opacity: 0, y: 60 }, { opacity: 1, y: 0 }, { 
+        duration: 1, delay: 1.6 
+      });
+      tl.fromTo('.hero-cta', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1 }, { 
+        duration: 0.8, delay: 2 
+      });
+
+      // Enhanced scroll-triggered animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const element = entry.target;
+            
+            if (element.classList.contains('animate-on-scroll')) {
+              element.style.opacity = '1';
+              element.style.transform = 'translateY(0px) scale(1)';
+            }
+            
+            if (element.classList.contains('stagger-children')) {
+              const children = element.querySelectorAll('.stagger-item');
+              children.forEach((child, index) => {
+                setTimeout(() => {
+                  child.style.opacity = '1';
+                  child.style.transform = 'translateY(0px) scale(1)';
+                }, index * 150);
+              });
+            }
+          }
+        });
+      }, observerOptions);
+
+      // Observe elements
+      document.querySelectorAll('.animate-on-scroll, .stagger-children').forEach(el => {
+        observer.observe(el);
+      });
+
+      // Enhanced scroll effects
+      const handleScroll = () => {
+        const scrolled = window.scrollY;
+        setScrollY(scrolled);
+
+        // Header background with blur
+        const header = document.querySelector('.header');
+        if (header) {
+          const opacity = Math.min(scrolled / 100, 0.95);
+          const blur = Math.min(scrolled / 50, 10);
+          header.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
+          header.style.backdropFilter = `blur(${blur}px)`;
+        }
+
+        // Progress line animation
+        const workSection = document.querySelector('#work');
+        const progressLine = document.querySelector('.progress-line');
+        const progressIndicator = document.querySelector('.progress-indicator');
+        
+        if (workSection && progressLine && progressIndicator) {
+          const workRect = workSection.getBoundingClientRect();
+          const workTop = workRect.top + scrolled;
+          const workHeight = workRect.height;
+          const windowHeight = window.innerHeight;
+          
+          // Calculate progress through the work section
+          const sectionProgress = Math.max(0, Math.min(1, 
+            (scrolled + windowHeight - workTop) / (workHeight + windowHeight)
+          ));
+          
+          // Update progress line height
+          progressLine.style.height = `${sectionProgress * 100}%`;
+          
+          // Update indicator position
+          const indicatorPosition = sectionProgress * 100;
+          progressIndicator.style.top = `${Math.min(indicatorPosition, 95)}%`;
+          
+          // Show/hide based on section visibility
+          const lineContainer = document.querySelector('.progress-line-container');
+          if (lineContainer) {
+            if (workRect.bottom > 0 && workRect.top < windowHeight) {
+              lineContainer.style.opacity = '1';
+            } else {
+              lineContainer.style.opacity = '0';
+            }
+          }
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      setIsLoaded(true);
+
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        observer.disconnect();
+      };
+    };
+
+    initializeScroll();
+  }, []);
+
+  const projects = [
+    {
+      title: "SteamX",
+      subtitle: "Video Sharing Platform",
+      tech: ["Node.js", "React.js", "MongoDB", "WebRTC", "NLP"],
+      description: "Full-stack video streaming platform with OAuth authentication, live streaming capabilities, and hybrid recommendation system using TF-IDF and collaborative filtering.",
+      year: "2024",
+      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop&crop=center"
+    },
+    {
+      title: "Smart Delhi Router",
+      subtitle: "AI-Powered Navigation",
+      tech: ["LLM", "Langchain", "GNN", "Reinforcement Learning"],
+      description: "Travel helper powered by Graph Neural Networks and Reinforcement Learning for optimized path prediction with real-time traffic analysis.",
+      year: "2025",
+      status: "In Development",
+      image: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=800&h=600&fit=crop&crop=center"
+    },
+    {
+      title: "Uber Clone",
+      subtitle: "Ride Booking Platform",
+      tech: ["React.js", "Node.js", "Google Maps API", "Socket.io"],
+      description: "Real-time ride-booking application with live tracking, driver-passenger communication, and integrated payment processing.",
+      year: "2024",
+      image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop&crop=center"
+    },
+    {
+      title: "YouTube Transcript Q/A",
+      subtitle: "RAG-based System",
+      tech: ["Python", "LangChain", "HuggingFace", "FAISS"],
+      description: "Intelligent system for summarizing and answering questions from YouTube video transcripts using vector similarity search.",
+      year: "2024",
+      image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=600&fit=crop&crop=center"
+    },
+    {
+      title: "Verbose LLM",
+      subtitle: "Language Model Implementation",
+      tech: ["PyTorch", "GPT-2", "QLoRA"],
+      description: "Complete GPT-2 architecture implementation from scratch with QLoRA fine-tuning for efficient model adaptation.",
+      year: "2024",
+      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop&crop=center"
+    },
+    {
+      title: "Video Chat App",
+      subtitle: "Real-time Communication",
+      tech: ["React.js", "WebRTC", "Socket.io", "Redis"],
+      description: "Peer-to-peer video chat platform with group rooms and Redis-based session management.",
+      year: "2024",
+      image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop&crop=center"
+    }
+  ];
+
+  const skillIcons = {
+    // Languages
+    "Python": <FileCode className="w-5 h-5" />,
+    "JavaScript": <Code className="w-5 h-5" />,
+    "TypeScript": <FileCode className="w-5 h-5" />,
+    "Java": <FileCode className="w-5 h-5" />,
+    "C": <Code className="w-5 h-5" />,
+    "R": <FileCode className="w-5 h-5" />,
+    
+    // AI & ML
+    "TensorFlow": <Brain className="w-5 h-5" />,
+    "PyTorch": <Brain className="w-5 h-5" />,
+    "Scikit-learn": <Brain className="w-5 h-5" />,
+    "OpenCV": <Eye className="w-5 h-5" />,
+    "YOLO": <Eye className="w-5 h-5" />,
+    "NLP": <Brain className="w-5 h-5" />,
+    "LangChain": <Layers className="w-5 h-5" />,
+    
+    // Frontend
+    "React": <Box className="w-5 h-5" />,
+    "Three.js": <Box className="w-5 h-5" />,
+    "Tailwind CSS": <Palette className="w-5 h-5" />,
+    "GSAP": <Zap className="w-5 h-5" />,
+    "Motion": <Zap className="w-5 h-5" />,
+    
+    // Backend
+    "Node.js": <Server className="w-5 h-5" />,
+    "Express.js": <Server className="w-5 h-5" />,
+    "REST APIs": <Globe className="w-5 h-5" />,
+    "GraphQL": <Globe className="w-5 h-5" />,
+    "Socket.io": <Zap className="w-5 h-5" />,
+    
+    // Databases
+    "MongoDB": <Database className="w-5 h-5" />,
+    "MySQL": <Database className="w-5 h-5" />,
+    "Redis": <Database className="w-5 h-5" />,
+    "ChromaDB": <Database className="w-5 h-5" />,
+    "FAISS": <Database className="w-5 h-5" />,
+    
+    // Tools
+    "Docker": <Box className="w-5 h-5" />,
+    "Git": <Code className="w-5 h-5" />,
+    "OAuth 2.0": <Cpu className="w-5 h-5" />,
+    "WebRTC": <Globe className="w-5 h-5" />,
+    "Google Maps API": <MapPin className="w-5 h-5" />
+  };
+
+  const skills = [
+    { category: "Languages", items: ["Python", "JavaScript", "TypeScript", "Java", "C", "R"] },
+    { category: "AI & Machine Learning", items: ["TensorFlow", "PyTorch", "Scikit-learn", "OpenCV", "YOLO", "NLP", "LangChain"] },
+    { category: "Frontend", items: ["React", "Three.js", "Tailwind CSS", "GSAP", "Motion"] },
+    { category: "Backend", items: ["Node.js", "Express.js", "REST APIs", "GraphQL", "Socket.io"] },
+    { category: "Databases", items: ["MongoDB", "MySQL", "Redis", "ChromaDB", "FAISS"] },
+    { category: "Tools & Services", items: ["Docker", "Git", "OAuth 2.0", "WebRTC", "Google Maps API"] }
+  ];
+
+  const titleWords = ["AI", "Engineer", "&", "Full-Stack", "Developer"];
+
+  return (
+    <div ref={scrollRef} className="bg-white text-gray-900 overflow-x-hidden">
+      {/* Navigation */}
+      <nav className="header fixed top-0 w-full z-50 border-b border-gray-100 transition-all duration-500">
+        <div className="max-w-6xl mx-auto px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div className="text-xl font-light tracking-wide">
+              <a href="" className="hover:text-gray-600 transition-colors duration-300">Harsh Singh</a>
+            </div>
+            <div className="hidden md:flex space-x-12 text-sm">
+              <a href="#work" className="hover:text-gray-600 transition-colors duration-300 relative group">
+                Work
+                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-gray-600 transition-all duration-300 group-hover:w-full"></span>
+              </a>
+              <a href="#about" className="hover:text-gray-600 transition-colors duration-300 relative group">
+                About
+                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-gray-600 transition-all duration-300 group-hover:w-full"></span>
+              </a>
+              <a href="#contact" className="hover:text-gray-600 transition-colors duration-300 relative group">
+                Contact
+                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-gray-600 transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center justify-center px-8 relative">
+        <div className="max-w-4xl text-center relative z-10">
+          <h1 className="hero-title text-5xl md:text-7xl font-light leading-tight mb-8 tracking-tight">
+            {titleWords.map((word, index) => (
+              <span key={word} className="inline-block opacity-0 mr-4" style={{transitionDelay: `${index * 100}ms`}}>
+                {word}
+                {index === 1 && <br />}
+              </span>
+            ))}
+          </h1>
+          <p className="hero-subtitle text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light opacity-0">
+            Crafting intelligent solutions at the intersection of artificial intelligence 
+            and modern web technologies.
+          </p>
+          <div className="hero-location mt-12 flex items-center justify-center space-x-6 text-gray-500 opacity-0">
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4" />
+              <a target="_blank" rel="noopener noreferrer" href='https://www.google.com/maps?sca_esv=c2df872898b90107&biw=1536&bih=776&output=search&q=bhiwadi&source=lnms&fbs=AIIjpHxCtmkhHKu27CW9pNYJlh4RoZZ_y8scaivnpjp3a9aEstvyzM9WArA0Q4B52rAVe2Sa6zFfiAm8cYa8nfYhOqjaGPs97G_EEy9Tt64nlu2xgJyH7djRPh1Zp4ZyU7slLZJkkl8osrh_3de-FunqNJbi4EoV5I2Eqn4_4eq239ycLLY4F9tiWRzrPEXFMal72TFfbTKm5Y5M7xLma77fv-6n-dHK1rbLNNK3mmEDDwXMVu01E-g&entry=mc&ved=1t:200715&ictx=111'>Alwar, Rajasthan</a>
+            </div>
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4" />
+              <span>+91 7240324397</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+      {/* About Section */}
+      <section id="about" className="py-32 px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-12 gap-16">
+            <div className="md:col-span-4 animate-on-scroll opacity-0 transform translate-y-12 transition-all duration-1000 ease-out">
+              <h2 className="text-sm uppercase tracking-widest text-gray-500 mb-8">
+                About
+              </h2>
+            </div>
+            
+            <div className="md:col-span-8 animate-on-scroll opacity-0 transform translate-y-16 transition-all duration-1000 ease-out delay-200">
+              <div className="prose prose-lg max-w-none">
+                <p className="text-2xl leading-relaxed font-light text-gray-700 mb-12">
+                  Currently pursuing B.Tech in Artificial Intelligence and Data Science at 
+                  Indian Institute of Information Technology Sricity, with a focus on creating 
+                  innovative solutions that bridge theoretical AI concepts with practical applications.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-16 mt-20">
+                  <div>
+                    <h3 className="text-xl font-light mb-8 text-gray-900">Education</h3>
+                    <div className="space-y-3">
+                      <div className="text-gray-700 flex text-lg"><img className='w-[15%] h-[15%] p-1' src='/logo.png'></img>Indian Institute of Information Technology, Sri City, Chittoor</div>
+                      <div className="text-gray-600">B.Tech AI & Data Science</div>
+                      <div className="text-gray-500">2023-2027 • CGPA 8.05</div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-light mb-8 text-gray-900">Recognition</h3>
+                    <div className="space-y-3">
+                      <div className="text-gray-700 text-lg">300+ DSA Problems Solved</div>
+                      <div className="text-gray-600">LeetCode & Codeforces</div>
+                      <div className="text-gray-500">Rating: 891</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Work Section */}
+      <section id="work" className="py-32 px-8 relative">
+        {/* Progress Line */}
+        <div className="progress-line-container hidden md:block absolute left-8 top-32 bottom-32 opacity-0 transition-opacity duration-500">
+          <div className="relative h-full">
+            {/* Background line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gray-200"></div>
+            
+            {/* Progress line */}
+            <div className="progress-line absolute left-1/2 transform -translate-x-1/2 w-px bg-gray-400 transition-all duration-300 ease-out" style={{height: '0%'}}></div>
+            
+            {/* Moving indicator */}
+            <div className="progress-indicator absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-gray-600 rounded-full transition-all duration-300 ease-out shadow-sm" style={{top: '0%'}}>
+              <div className="absolute inset-0 bg-gray-600 rounded-full animate-ping opacity-20"></div>
+            </div>
+            
+            {/* Project dots */}
+            {projects.map((_, index) => (
+              <div 
+                key={index}
+                className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-gray-300 rounded-full transition-colors duration-300"
+                style={{top: `${(index + 1) * (100 / (projects.length + 1))}%`}}
+              ></div>
+            ))}
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-24 animate-on-scroll opacity-0 transform translate-y-12 transition-all duration-1000 ease-out">
+            <h2 className="text-sm uppercase tracking-widest text-gray-500 mb-4">
+              Selected Work
+            </h2>
+          </div>
+          
+          <div className="space-y-32 stagger-children md:ml-16">
+            {projects.map((project, index) => (
+              <div 
+                key={project.title}
+                className="stagger-item opacity-0 transform translate-y-16 transition-all duration-1000 ease-out group relative"
+              >
+                {/* Background Image for Mobile */}
+                <div className="absolute inset-0 md:hidden rounded-2xl overflow-hidden">
+                  <img 
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover blur-sm opacity-20 group-hover:opacity-30 transition-opacity duration-500"
+                  />
+                  <div className="absolute inset-0 bg-white/80"></div>
+                </div>
+                
+                <div className="grid md:grid-cols-12 gap-8 items-start relative z-10">
+                  <div className="md:col-span-3">
+                    <div className="text-sm text-gray-500 mb-2">{project.year}</div>
+                    {project.status && (
+                      <div className="text-xs px-3 py-1 bg-green-100 text-green-600 rounded-full inline-block mb-4">
+                        {project.status}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="md:col-span-6">
+                    <h3 className="text-3xl md:text-4xl font-light mb-3 group-hover:text-gray-600 transition-all duration-500 cursor-pointer">
+                      {project.title}
+                    </h3>
+                    <p className="text-lg text-gray-600 mb-6 font-light">{project.subtitle}</p>
+                    <p className="text-gray-700 leading-relaxed mb-8 font-light text-lg">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      {project.tech.map((tech, techIndex) => (
+                        <span 
+                          key={tech}
+                          className="text-xs px-4 py-2 bg-gray-100 text-gray-600 rounded-full tracking-wide hover:bg-gray-200 transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+                          style={{
+                            transitionDelay: `${techIndex * 50}ms`
+                          }}
+                        >
+                          {skillIcons[tech]}
+                          <span>{tech}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="md:col-span-3 flex justify-end">
+                    {/* Desktop Image */}
+                    <div className="hidden md:block relative">
+                      <div className="w-48 h-32 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-all duration-500">
+                        <img 
+                          src={project.image}
+                          alt={project.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div>
+                      </div>
+                      <div className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white transition-all duration-500">
+                        <ArrowUpRight className="w-5 h-5 text-gray-600" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="h-px bg-gray-200 mt-16"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section className="py-32 px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-24 animate-on-scroll opacity-0 transform translate-y-12 transition-all duration-1000 ease-out">
+            <h2 className="text-sm uppercase tracking-widest text-gray-500 mb-4">
+              Technical Expertise
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-16 stagger-children">
+            {skills.map((skillGroup, index) => (
+              <div 
+                key={skillGroup.category}
+                className="stagger-item opacity-0 transform translate-y-12 transition-all duration-1000 ease-out group"
+              >
+                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-500 border border-gray-100 hover:border-gray-200 h-full">
+                  <h3 className="text-xl font-light mb-8 text-gray-900 group-hover:text-gray-700 transition-colors duration-300">
+                    {skillGroup.category}
+                  </h3>
+                  <div className="space-y-4">
+                    {skillGroup.items.map((skill, skillIndex) => (
+                      <div 
+                        key={skill} 
+                        className="flex items-center space-x-3 text-gray-600 font-light text-lg hover:text-gray-900 transition-all duration-300 cursor-pointer group/item"
+                        style={{
+                          transitionDelay: `${skillIndex * 100}ms`
+                        }}
+                      >
+                        <div className="text-gray-400 group-hover/item:text-gray-600 transition-colors duration-300">
+                          {skillIcons[skill] || <Code className="w-5 h-5" />}
+                        </div>
+                        <span className="group-hover/item:translate-x-1 transition-transform duration-300">
+                          {skill}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      
+
+      {/* Contact Section */}
+      <section id="contact" className="py-32 px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-12 gap-16">
+            <div className="md:col-span-4 animate-on-scroll opacity-0 transform translate-y-12 transition-all duration-1000 ease-out">
+              <h2 className="text-sm uppercase tracking-widest text-gray-500 mb-8">
+                Get in Touch
+              </h2>
+            </div>
+            
+            <div className="md:col-span-8 animate-on-scroll opacity-0 transform translate-y-16 transition-all duration-1000 ease-out delay-200">
+              <div className="mb-16">
+                <p className="text-2xl leading-relaxed font-light text-gray-700">
+                  Open to discussing new opportunities, collaborations, and innovative projects 
+                  in AI, machine learning, and full-stack development.
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-12 stagger-children">
+                <div className="space-y-6 stagger-item opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
+                  <a 
+                    href="mailto:harshsingh794613@gmail.com"
+                    className="flex items-center space-x-4 text-gray-700 hover:text-gray-900 transition-colors duration-300 group text-lg"
+                  >
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-300">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <span className="group-hover:underline">harshsingh794613@gmail.com</span>
+                  </a>
+                  
+                  <div className="flex items-center space-x-4 text-gray-600 text-lg">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <span>+91 7240324397</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4 text-gray-600 text-lg">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                      <MapPin className="w-5 h-5" />
+                    </div>
+                    <span>Alwar, Rajasthan</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-6 stagger-item opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
+                  <a 
+                    href="#"
+                    className="flex items-center space-x-4 text-gray-700 hover:text-gray-900 transition-colors duration-300 group text-lg"
+                  >
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-300">
+                      <Linkedin className="w-5 h-5" />
+                    </div>
+                    <span className="group-hover:underline">LinkedIn</span>
+                  </a>
+                  
+                  <a 
+                    href="#"
+                    className="flex items-center space-x-4 text-gray-700 hover:text-gray-900 transition-colors duration-300 group text-lg"
+                  >
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-300">
+                      <Github className="w-5 h-5" />
+                    </div>
+                    <span className="group-hover:underline">GitHub</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-16 px-8 border-t border-gray-200">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center text-gray-500">
+            <div>© 2025 Harsh Singh</div>
+            <div>Alwar, Rajasthan</div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
