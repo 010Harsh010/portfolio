@@ -8,6 +8,17 @@ html {
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; 
+  scrollbar-width: none;    
 }
+html, body {
+  overflow-y: scroll;          /* Enables vertical scroll */
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* Internet Explorer/Edge */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;               /* Chrome, Safari, Opera */
+}
+
