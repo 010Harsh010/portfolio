@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowUpRight, Search, Filter } from "lucide-react";
+import projects from "./data/projects";
 
 const Projects = () => {
   const [query, setQuery] = useState("");
@@ -8,88 +10,6 @@ const Projects = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const projects = [
-    {
-      title: "StreamX",
-      subtitle: "Video Sharing Platform",
-      tech: ["Node.js", "React.js", "MongoDB", "OAuth 2.0", "Redis", "WebRTC"],
-      description:
-        "A full-stack video platform with OAuth 2.0 authentication, video upload/streaming, and creator-based publishing using React, Node.js, and MongoDB. Integrated a real-time streaming pipeline service using WebRTC with STUN/TURN for NAT traversal. Developed a hybrid recommendation system combining TF-IDF, collaborative filtering, and NLP-based metadata similarity, Improved recommendation response latency by caching similarity results in Redis",
-      year: "2024",
-      image: "./stream.jpg",
-      url: "https://streamsx.vercel.app/",
-    },
-    {
-      title: "Web Ride Booking Service",
-      subtitle: "Ride Booking Platform",
-      tech: [
-        "React.js",
-        "Node.js",
-        "MongoDB",
-        "Google Maps API",
-        "Socket.io",
-        "Razorpay",
-      ],
-      description:
-        "Developed a full-stack ride-booking system with real-time driver tracking, ride lifecycle management, and Razorpay payments. , with an event-driven real-time architecture using Socket.io to push ride status updates, driver location changes, and chat messages. Integrated Google Maps API for live geolocation, route distance estimation, and fare calculation.",
-      year: "2024",
-      image: "Uber.jpg",
-      url: "https://github.com/010Harsh010/Uber-clone",
-    },
-    {
-      title: "Smart Delhi Router",
-      subtitle: "AI-Powered Navigation",
-      tech: ["LLM", "LangChain", "Tools", "Reinforcement Learning", "GNN"],
-      description:
-        "Travel-routing assistant combining LLM with GNN + RL for path prediction beyond classical Dijkstra routing. Used a Graph Neural Network to learn edge weights from real-world factors such as traffic density, enabling improved ETA estimation with 0.15 loss. Applied Reinforcement Learning to optimize route selection under live-traffic conditions by minimizing travel time and rerouting cost.",
-      year: "2025",
-      status: "Present",
-      image: "route.jpg",
-      url: "https://colab.research.google.com/drive/1NIfYJTiNBW5A1k41RUNTBWr-zYWoFVTB?usp=sharing",
-    },
-    {
-      title: "AgriGuard",
-      subtitle: "Agriculture Logistics Management",
-      tech: ["Langchain", "langgraph", "FastMCP", "SLM", "Ollama", "Knowledge Graph"],
-      description:
-        "Building an agriculture logistics management system using knowledge-graph reasoning and a fine-tuned small language model (SLM) for decision support. Designing a priority-based dispatch workflow to reduce warehouse-to-market transport delays by reasoning over supply urgency, route constraints, and inventory dependencies.",
-      year: "2026",
-      status: "Present",
-      image: "agrigaurd.jpeg",
-      url: "",
-    },
-    {
-      title: "YouTube Transcript Q/A",
-      subtitle: "RAG-based System",
-      tech: ["Python", "LangChain", "HuggingFace", "FAISS"],
-      description:
-        "Intelligent system for summarizing and answering questions from YouTube video transcripts using vector similarity search.",
-      year: "2024",
-      image: "youtube.jpg",
-      url: "https://colab.research.google.com/drive/124QsmjcgtedExPwU-WYrJ3220ztA8wZU?usp=sharing",
-    },
-    {
-      title: "Verbose LLM",
-      subtitle: "Language Model Implementation",
-      tech: ["PyTorch", "GPT-2", "QLoRA"],
-      description:
-        "Complete GPT-2 architecture implementation from scratch with QLoRA fine-tuning for efficient model adaptation.",
-      year: "2024",
-      image: "llm.jpg",
-      url: "https://colab.research.google.com/drive/1wC0ZVZjpq62pGFEr6lt3Ga_vrkKLOPwB?usp=sharing",
-    },
-    {
-      title: "Video Chat App",
-      subtitle: "Real-time Communication",
-      tech: ["React.js", "WebRTC", "Socket.io", "Redis"],
-      description:
-        "Peer-to-peer video chat platform with group rooms and Redis-based session management.",
-      year: "2024",
-      image: "chat.jpg",
-      url: "https://chitterchatters.vercel.app/",
-    },
-  ];
 
   const years = ["All", ...Array.from(new Set(projects.map((p) => p.year))).sort().reverse()];
 
@@ -104,15 +24,15 @@ const Projects = () => {
     <div className="min-h-screen bg-white text-gray-900">
       <nav className="fixed top-0 w-full z-50 border-b border-gray-100 bg-white/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-8 py-6 flex items-center justify-between">
-          <a href="/" className="text-2xl font-light tracking-wide hover:text-gray-600 transition-colors">
+          <a href="/portfolio" className="text-2xl font-light tracking-wide hover:text-gray-600 transition-colors">
             Harsh Singh
           </a>
 
           <div className="flex items-center gap-6 text-sm text-gray-600">
-            <a href="/" className="hover:text-gray-900 transition-colors">
+            <a href="/portfolio" className="hover:text-gray-900 transition-colors">
               Home
             </a>
-            <a href="/projects" className="hover:text-gray-900 transition-colors">
+            <a href="/portfolio/projects" className="hover:text-gray-900 transition-colors">
               Projects
             </a>
           </div>
@@ -174,21 +94,30 @@ const Projects = () => {
                       {project.status ? ` • ${project.status}` : ""}
                     </div>
 
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                       <h2 className="text-3xl font-light text-gray-900">
                         {project.title}
                       </h2>
 
-                      {project.url && (
-                        <a
-                          href={project.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-300"
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/portfolio/projects/${project.slug}`}
+                          className="text-sm text-indigo-600 hover:text-indigo-900 font-medium"
                         >
-                          <ArrowUpRight className="w-5 h-5 text-gray-600" />
-                        </a>
-                      )}
+                          View details
+                        </Link>
+
+                        {project.url && (
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-300"
+                          >
+                            <ArrowUpRight className="w-5 h-5 text-gray-600" />
+                          </a>
+                        )}
+                      </div>
                     </div>
 
                     <p className="text-lg text-gray-600 font-light mb-6">
