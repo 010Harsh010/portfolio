@@ -669,7 +669,7 @@ const App = () => {
                 <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-gray-600 transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a
-                href="RESUME.pdf"
+                href="https://drive.google.com/file/d/1d91edXfAFOZ1u28Hhf9dt10ZP8QzeA2L/view?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 transition-colors duration-300 relative group"
